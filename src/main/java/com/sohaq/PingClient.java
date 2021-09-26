@@ -18,7 +18,7 @@ public class PingClient {
     public static void main(String[] args) throws Exception {
         List<PingResponse> res = doPing("https://www.google.com");
         assert res != null;
-        System.out.println(res.toString());
+        System.out.println(res);
     }
     public static List<PingResponse> doPing(String serviceUrl) throws Exception {
         // Get command line arguments.
@@ -68,6 +68,7 @@ public class PingClient {
                 pingResponse.setPort(port);
                 pingResponse.setHost(hostname);
                 list.add(pingResponse);
+                System.out.println(list);
             } catch (IOException e) {
                 // Print which packet has timed out
                 System.out.println("Timeout for packet " + sequence_number);
