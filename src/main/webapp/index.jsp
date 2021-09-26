@@ -96,6 +96,16 @@
                 width: 48%;
             }
         }
+
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            margin: 0 auto;
+        }
+
+        table tr td, table tr th {
+            border: 1px solid;
+        }
     </style>
 </head>
 <body>
@@ -112,7 +122,7 @@
             </div>
         </div>
     </form>
-    <div id="table-container">
+    <div id="table-container" class="main-block form">
 
     </div>
 </div>
@@ -143,34 +153,52 @@
         xmlHttp.onreadystatechange = function () {
             if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
                 const jsonResponse = JSON.parse(xmlHttp.responseText);
+                if (jsonResponse['message']) {
+                    alert(jsonResponse['message']);
+                    return;
+                }
                 const data = jsonResponse['data'];
-                console.log(data);
+                document.getElementById("table-container").innerHTML = '';
                 createTable(data);
             }
         }
-        xmlHttp.open("post", contextPath + "/udp?url=" + str);
+        xmlHttp.open("post", contextPath + "/udp?url=" + str+"&random="+Math.random());
         xmlHttp.send();
     }
 
     function createTable(tableData) {
         const table = document.createElement('table');
+        const tableHead = document.createElement('thead');
+        const row = document.createElement('tr');
+        const cell1 = document.createElement('th');
+        row.appendChild(cell1);
+        cell1.appendChild(document.createTextNode('IP Address'));
+        const cell2 = document.createElement('th');
+        cell2.appendChild(document.createTextNode('Port'));
+        row.appendChild(cell2);
+        const cell3 = document.createElement('th');
+        cell3.appendChild(document.createTextNode('Domain'));
+        row.appendChild(cell3);
+        const cell4 = document.createElement('th');
+        cell4.appendChild(document.createTextNode('Delay Time in (ms)'));
+        row.appendChild(cell4);
+        tableHead.appendChild(row);
+        table.appendChild(tableHead)
         const tableBody = document.createElement('tbody');
         tableData.forEach(function (rowData) {
             const row = document.createElement('tr');
-            rowData.forEach(function (cellData) {
-                const cell1 = document.createElement('td');
-                cell1.appendChild(document.createTextNode(cellData['ip']));
-                row.appendChild(cell1);
-                const cell2 = document.createElement('td');
-                cell2.appendChild(document.createTextNode(cellData['port']));
-                row.appendChild(cell2);
-                const cell3 = document.createElement('td');
-                cell3.appendChild(document.createTextNode(cellData['host']));
-                row.appendChild(cell3);
-                const cell4 = document.createElement('td');
-                cell4.appendChild(document.createTextNode(cellData['delay']));
-                row.appendChild(cell4);
-            });
+            const cell1 = document.createElement('td');
+            cell1.appendChild(document.createTextNode(rowData['ip']));
+            row.appendChild(cell1);
+            const cell2 = document.createElement('td');
+            cell2.appendChild(document.createTextNode(rowData['port']));
+            row.appendChild(cell2);
+            const cell3 = document.createElement('td');
+            cell3.appendChild(document.createTextNode(rowData['host']));
+            row.appendChild(cell3);
+            const cell4 = document.createElement('td');
+            cell4.appendChild(document.createTextNode(rowData['delay']));
+            row.appendChild(cell4);
             tableBody.appendChild(row);
         });
         table.appendChild(tableBody);

@@ -10,9 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @WebServlet("/udp")
 public class DemoServlet extends HttpServlet {
@@ -36,9 +34,13 @@ public class DemoServlet extends HttpServlet {
             JSONArray arr = new JSONArray(data);
             obj.put("data", arr);
             out.println(obj);
+            out.flush();
+            resp.flushBuffer();
         } catch (Exception e) {
             obj.put("message", "Request processing fail");
             out.println(obj);
+            resp.flushBuffer();
+            out.flush();
         }
     }
 }

@@ -20,6 +20,7 @@ public class PingClient {
         assert res != null;
         System.out.println(res);
     }
+
     public static List<PingResponse> doPing(String serviceUrl) throws Exception {
         // Get command line arguments.
         if (serviceUrl == null) {
@@ -68,13 +69,15 @@ public class PingClient {
                 pingResponse.setPort(port);
                 pingResponse.setHost(hostname);
                 list.add(pingResponse);
-                System.out.println(list);
             } catch (IOException e) {
                 // Print which packet has timed out
+                PingResponse pr = new PingResponse("Timeout for packet " + sequence_number, 0);
+                list.add(pr);
                 System.out.println("Timeout for packet " + sequence_number);
             }
             // next packet
             sequence_number++;
+//            Thread.sleep(1000);
         }
         return list;
     }
