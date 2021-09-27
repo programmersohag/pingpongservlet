@@ -6,6 +6,11 @@ public class PingResponse {
     private int port;
     private String host;
     private long delay;
+    private String timeout;
+
+    public PingResponse(String timeout) {
+        this.timeout = timeout;
+    }
 
     public PingResponse(String ip, long delay) {
         this.ip = ip;
@@ -44,13 +49,11 @@ public class PingResponse {
         this.delay = delay;
     }
 
-    @Override
-    public String toString() {
-        return "PingResponse{" +
-                "ip='" + ip + '\'' +
-                ", port=" + port +
-                ", host='" + host + '\'' +
-                ", delay=" + delay +
-                '}';
+    public String getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(String timeout) {
+        this.timeout = timeout;
     }
 }

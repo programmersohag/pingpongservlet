@@ -3,7 +3,6 @@ package com.sohaq;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,16 +14,8 @@ import java.util.List;
 @WebServlet("/udp")
 public class DemoServlet extends HttpServlet {
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
-        JSONObject obj = new JSONObject();
-        obj.put("text", "Hello World Servlet");
-        out.println(obj);
-    }
-
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String url = req.getParameter("url");
         resp.setContentType("application/json");
         PrintWriter out = resp.getWriter();
@@ -37,6 +28,7 @@ public class DemoServlet extends HttpServlet {
             out.flush();
             resp.flushBuffer();
         } catch (Exception e) {
+            e.printStackTrace();
             obj.put("message", "Request processing fail");
             out.println(obj);
             resp.flushBuffer();

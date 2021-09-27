@@ -15,12 +15,6 @@ import java.util.List;
 public class PingClient {
     private static final int MAX_TIMEOUT = 1000;    // milliseconds
 
-    public static void main(String[] args) throws Exception {
-        List<PingResponse> res = doPing("https://www.google.com");
-        assert res != null;
-        System.out.println(res);
-    }
-
     public static List<PingResponse> doPing(String serviceUrl) throws Exception {
         // Get command line arguments.
         if (serviceUrl == null) {
@@ -37,10 +31,11 @@ public class PingClient {
         // Create a data gram socket for sending and receiving UDP packets
         // through the port specified on the command line.
         DatagramSocket socket = new DatagramSocket(port);
+//        socket.setReuseAddress(true);
         int sequence_number = 0;
         // Processing loop.
         List<PingResponse> list = new ArrayList<>();
-        while (sequence_number < 10) {
+        while (sequence_number < 3) {
             // Timestamp in ms when we send it
             Date now = new Date();
             long msSend = now.getTime();
@@ -70,15 +65,14 @@ public class PingClient {
                 pingResponse.setHost(hostname);
                 list.add(pingResponse);
             } catch (IOException e) {
-                // Print which packet has timed out
-                PingResponse pr = new PingResponse("Timeout for packet " + sequence_number, 0);
+                PingResponse pr = new PingResponse("Request Timeout for packet " + sequence_number);
                 list.add(pr);
-                System.out.println("Timeout for packet " + sequence_number);
             }
             // next packet
             sequence_number++;
 //            Thread.sleep(1000);
         }
+        socket.close();
         return list;
     }
 
@@ -107,7 +101,7 @@ public class PingClient {
         String line = br.readLine();
         // Print host address and data received from it.
         String ip = request.getAddress().getHostAddress();
-        System.out.println("Received from " + request.getAddress().getHostAddress() + ": " + line + " Delay: " + delayTime);
+//        System.out.println("Received from " + request.getAddress().getHostAddress() + ": " + line + " Delay: " + delayTime);
         return new PingResponse(ip, delayTime);
     }
 }

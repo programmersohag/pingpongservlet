@@ -160,9 +160,11 @@
                 const data = jsonResponse['data'];
                 document.getElementById("table-container").innerHTML = '';
                 createTable(data);
+                const calculatedData = getMinMaxAvg(data);
+                createSummeryTable(calculatedData);
             }
         }
-        xmlHttp.open("post", contextPath + "/udp?url=" + str+"&random="+Math.random());
+        xmlHttp.open("post", contextPath + "/udp?url=" + str + "&random=" + Math.random());
         xmlHttp.send();
     }
 
@@ -180,30 +182,105 @@
         cell3.appendChild(document.createTextNode('Domain'));
         row.appendChild(cell3);
         const cell4 = document.createElement('th');
-        cell4.appendChild(document.createTextNode('Delay Time in (ms)'));
+        cell4.appendChild(document.createTextNode('Delay Time in (Mill Second)'));
         row.appendChild(cell4);
+        const cell5 = document.createElement('th');
+        cell5.appendChild(document.createTextNode('Delay Time in (Second)'));
+        row.appendChild(cell5);
         tableHead.appendChild(row);
         table.appendChild(tableHead)
         const tableBody = document.createElement('tbody');
         tableData.forEach(function (rowData) {
-            const row = document.createElement('tr');
-            const cell1 = document.createElement('td');
-            cell1.appendChild(document.createTextNode(rowData['ip']));
-            row.appendChild(cell1);
-            const cell2 = document.createElement('td');
-            cell2.appendChild(document.createTextNode(rowData['port']));
-            row.appendChild(cell2);
-            const cell3 = document.createElement('td');
-            cell3.appendChild(document.createTextNode(rowData['host']));
-            row.appendChild(cell3);
-            const cell4 = document.createElement('td');
-            cell4.appendChild(document.createTextNode(rowData['delay']));
-            row.appendChild(cell4);
-            tableBody.appendChild(row);
+            if (rowData['timeout']) {
+                const row = document.createElement('tr');
+                const cell1 = document.createElement('td');
+                cell1.appendChild(document.createTextNode(rowData['timeout']));
+                cell1.colSpan = 5;
+                row.appendChild(cell1);
+                tableBody.appendChild(row);
+            } else {
+                const row = document.createElement('tr');
+                const cell1 = document.createElement('td');
+                cell1.appendChild(document.createTextNode(rowData['ip']));
+                row.appendChild(cell1);
+                const cell2 = document.createElement('td');
+                cell2.appendChild(document.createTextNode(rowData['port']));
+                row.appendChild(cell2);
+                const cell3 = document.createElement('td');
+                cell3.appendChild(document.createTextNode(rowData['host']));
+                row.appendChild(cell3);
+                const cell4 = document.createElement('td');
+                cell4.appendChild(document.createTextNode(millisToSeconds(rowData['delay'])));
+                row.appendChild(cell4);
+                const cell5 = document.createElement('td');
+                cell5.appendChild(document.createTextNode(rowData['delay']));
+                row.appendChild(cell5);
+                tableBody.appendChild(row);
+            }
         });
         table.appendChild(tableBody);
         document.getElementById("table-container").appendChild(table);
     }
+
+    function createSummeryTable(tableData) {
+        const table = document.createElement('table');
+        const tableHead = document.createElement('thead');
+        const row = document.createElement('tr');
+        const cell1 = document.createElement('th');
+        row.appendChild(cell1);
+        cell1.appendChild(document.createTextNode('Min'));
+        const cell2 = document.createElement('th');
+        cell2.appendChild(document.createTextNode('Max'));
+        row.appendChild(cell2);
+        const cell3 = document.createElement('th');
+        cell3.appendChild(document.createTextNode('Avg'));
+        row.appendChild(cell3);
+        const cell4 = document.createElement('th');
+        cell4.appendChild(document.createTextNode('Packets Lost Rate'));
+        row.appendChild(cell4);
+        tableHead.appendChild(row);
+        table.appendChild(tableHead)
+        const tableBody = document.createElement('tbody');
+
+        const oneRow = document.createElement('tr');
+        const one = document.createElement('td');
+        one.appendChild(document.createTextNode(tableData['min']));
+        oneRow.appendChild(one);
+        const two = document.createElement('td');
+        two.appendChild(document.createTextNode(tableData['max']));
+        oneRow.appendChild(two);
+        const three = document.createElement('td');
+        three.appendChild(document.createTextNode(tableData['avg']));
+        oneRow.appendChild(three);
+        const four = document.createElement('td');
+        four.appendChild(document.createTextNode(tableData['lossRate']));
+        oneRow.appendChild(four);
+        tableBody.appendChild(oneRow);
+        table.appendChild(tableBody);
+        document.getElementById("table-container").appendChild(table);
+    }
+
+    function millisToSeconds(millis) {
+        const seconds = ((millis % 60000) / 1000).toFixed(0);
+        return (seconds < 10 ? '0' : '') + seconds;
+    }
+
+    function getMinMaxAvg(tableData) {
+        const arr = [];
+        let count = 0;
+        tableData.forEach(function (rowData) {
+            if (rowData['timeout']) {
+                count++;
+            }
+            arr.push(rowData['delay']);
+        });
+        const lossRate = Math.round(((count / 3) * 100) * 100) / 100;
+        const min = Math.min(...arr), max = Math.max(...arr);
+        const sum = arr.reduce((a, b) => a + b, 0);
+        const avg = (sum / arr.length) || 0;
+        return {min: min, max: max, avg: avg.toFixed(2), lossRate: lossRate + '%'}
+    }
+
 </script>
 </body>
 </html>
